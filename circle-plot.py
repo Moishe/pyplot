@@ -1,6 +1,7 @@
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import svgwrite
 from svgwrite import cm, mm
 
@@ -94,8 +95,8 @@ def plot_shell_interferences(ax):
         paths["interference-%d" % idx] = coords
 
 def make_svg_file(name, path):
-    name = "output/%s.svg" % name
-    dwg = svgwrite.Drawing(filename=name, debug=True, width='%dmm' % dimensions[0], height='%dmm' % dimensions[1])
+    filename = "output/%s.svg" % name
+    dwg = svgwrite.Drawing(filename=filename, debug=True, width='%dmm' % dimensions[0], height='%dmm' % dimensions[1])
     lines = dwg.add(dwg.g(id='lines', stroke='black', stroke_width='0.1'))
 
     translated_path = [(p[0] + dimensions[0] / 2, p[1] + dimensions[1] / 2) for p in path]
@@ -110,6 +111,8 @@ def make_svg_file(name, path):
                            end=(pair[1][0] * mm, pair[1][1] * mm)))
 
     dwg.save()
+    new_filename = "output/proc-%s.svg" % name
+    os.system("vpype read %s linemerge reloop linesort write %s" % (filename, new_filename))
 
 def plot():
     fig, ax = plt.subplots()
