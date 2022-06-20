@@ -1,4 +1,5 @@
 import itertools
+from xml.etree.ElementTree import PI
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -7,27 +8,18 @@ from svgwrite import cm, mm
 
 dimensions = [210, 297]
 
+EMIT_SVG = True
+
 boundaries = [
     {
-        'radius': 100,
+        'radius': 90,
         'frequency': 1,
         'start': 0,
-        'resolution': 1024,
-        'epicycle': {
-            'radius': 6,
-            'frequency': -16,
+        'resolution': 256,
+        'epicycle':  {
+            'radius': 12,
             'start': 0,
-        }
-    },
-    {
-        'radius': 80,
-        'frequency': 1,
-        'start': 0,
-        'resolution': 512,
-        'epicycle': {
-            'radius': 3,
-            'frequency': 12,
-            'start': 0
+            'frequency': -6
         }
     },
     {
@@ -36,11 +28,22 @@ boundaries = [
         'start': 0,
         'resolution': 256,
         'epicycle': {
-            'radius': 2,
-            'frequency': 24,
-            'start': 0
+            'radius': 3,
+            'start': 0,
+            'frequency': 12
         }
-    }
+    },
+    {
+        'radius': 20,
+        'frequency': 1,
+        'start': 0,
+        'resolution': 256,
+        'epicycle': {
+            'radius': 2,
+            'start': 0,
+            'frequency': 8
+        }
+    },
 ]
 
 paths = {}
@@ -59,7 +62,7 @@ def get_shell_coords(descriptor, radians):
 
 def plot_shell_boundary(ax, descriptor):
     coords = []
-    for i in range(0, descriptor['resolution']):
+    for i in range(0, descriptor['resolution'] + 1):
         r = get_r(i, descriptor['resolution'])
         xy = get_shell_coords(descriptor, r)
         coords.append(xy)
@@ -76,7 +79,7 @@ def plot_shell_boundaries(ax):
 def plot_shell_interference(ax, outer, inner):
     coords = []
     resolution = np.max([outer['resolution'], inner['resolution']])
-    for i in range(0, resolution):
+    for i in range(0, resolution + 1):
         r = get_r(i, resolution)
         for descriptor in [outer, inner]:
             xy = get_shell_coords(descriptor, r)
@@ -112,7 +115,8 @@ def make_svg_file(name, path):
 
     dwg.save()
     new_filename = "output/proc-%s.svg" % name
-    os.system("vpype read %s linemerge reloop linesort write %s" % (filename, new_filename))
+    os.system("vpype read %s linemerge reloop linesort write %s" %
+              (filename, new_filename))
 
 def plot():
     fig, ax = plt.subplots()
@@ -120,8 +124,9 @@ def plot():
     plot_shell_boundaries(ax)
     plot_shell_interferences(ax)
 
-    for name in paths:
-        make_svg_file(name, paths[name])
+    if EMIT_SVG:
+        for name in paths:
+            make_svg_file(name, paths[name])
 
     plt.show()
 
