@@ -6,7 +6,7 @@ import os
 import svgwrite
 from svgwrite import cm, mm
 
-dimensions = [210, 297]
+dimensions = [210, 210]
 
 EMIT_SVG = True
 
@@ -16,7 +16,7 @@ boundaries = [
         'frequency': 1,
         'start': 0,
         'resolution': 256,
-        'epicycle':  {
+        'epicycle': {
             'radius': 12,
             'start': 0,
             'frequency': -6
@@ -28,21 +28,22 @@ boundaries = [
         'start': 0,
         'resolution': 256,
         'epicycle': {
-            'radius': 3,
+            'radius': 4,
             'start': 0,
             'frequency': 12
         }
     },
     {
-        'radius': 20,
+        'radius': 30,
         'frequency': 1,
         'start': 0,
         'resolution': 256,
-        'epicycle': {
-            'radius': 2,
-            'start': 0,
-            'frequency': 8
-        }
+    },
+    {
+        'radius': 0,
+        'frequency': 1,
+        'start': 0,
+        'resolution': 256,
     },
 ]
 
@@ -114,7 +115,7 @@ def make_svg_file(name, path):
                            end=(pair[1][0] * mm, pair[1][1] * mm)))
 
     dwg.save()
-    new_filename = "output/proc-%s.svg" % name
+    new_filename = "proc/%s.svg" % name
     os.system("vpype read %s linemerge reloop linesort write %s" %
               (filename, new_filename))
 
